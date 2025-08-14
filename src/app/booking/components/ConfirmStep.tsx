@@ -21,9 +21,7 @@ export default function ConfirmStep({ service, date, time, name, phone, wantsWha
   const endDate = date.replace(/-/g, "") + "T" + (parseInt(time.split(":")[0]) + 1).toString().padStart(2, '0') + time.split(":")[1] + "00";
   const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(service)}&dates=${startDate}/${endDate}&details=Turno%20con%20${name}%20(${phone})&location=&sf=true&output=xml`;
 
-  // WhatsApp link
-  const whatsappMsg = `¡Hola! Te recuerdo tu turno para ${service || 'tu servicio'} el ${date.split("-").reverse().join("/" )} a las ${time}.`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMsg)}`;
+
 
   return (
     <div className="flex justify-center items-center min-h-[60vh]">

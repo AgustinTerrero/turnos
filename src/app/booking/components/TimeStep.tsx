@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Button } from "@/components/ui/button";
+
 
 type Props = {
   onSelect: (time: string) => void;
@@ -15,11 +15,11 @@ function getDayName(date: Date) {
 }
 
 function generateSlotsForDay(ranges: { start: string; end: string }[], date: Date, duration: number) {
-  let slots: string[] = [];
+  const slots: string[] = [];
   for (const range of ranges) {
     const [h, m] = range.start.split(":").map(Number);
     const [hEnd, mEnd] = range.end.split(":").map(Number);
-    let current = new Date(date);
+  const current = new Date(date);
     current.setHours(h, m, 0, 0);
     const end = new Date(date);
     end.setHours(hEnd, mEnd, 0, 0);
@@ -49,8 +49,8 @@ const TimeStep: React.FC<Props> = ({ onSelect, selectedTime, onBack, date }) => 
     setLoading(true);
 
     const configRef = collection(db, "schedule_config");
-    unsubConfig = onSnapshot(query(configRef), async (snap: any) => {
-      const configDoc = snap.docs ? snap.docs.find((d: any) => d.id === "main") : null;
+    unsubConfig = onSnapshot(query(configRef), async (snap) => {
+      const configDoc = snap.docs ? snap.docs.find((d) => d.id === "main") : null;
       const config = configDoc ? configDoc.data() : null;
       if (!config) {
         setSlots([]);
@@ -66,8 +66,8 @@ const TimeStep: React.FC<Props> = ({ onSelect, selectedTime, onBack, date }) => 
 
       const appointmentsRef = collection(db, "appointments");
       const q = query(appointmentsRef, where("date", "==", date));
-      unsubAppointments = onSnapshot(q, (snap2: any) => {
-        const reservedTimes = new Set<string>(snap2.docs.map((d: any) => d.data().time as string));
+      unsubAppointments = onSnapshot(q, (snap2) => {
+        const reservedTimes = new Set<string>(snap2.docs.map((d) => d.data().time as string));
         setReserved(reservedTimes);
         setLoading(false);
       });

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,18 @@ import { useRef } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
+
+type ScheduleConfigBase = {
+  [key: string]: { start: string; end: string }[] | undefined;
+};
+type ScheduleConfig = ScheduleConfigBase & {
+  bloqueados?: string[];
+};
+
 const DIAS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
 
 export default function HorarioConfig() {
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<ScheduleConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -38,7 +46,7 @@ export default function HorarioConfig() {
   useEffect(() => {
     const ref = doc(db, "schedule_config", "main");
     const unsub = onSnapshot(ref, (snap) => {
-      setConfig(snap.exists() ? snap.data() : {});
+  setConfig(snap.exists() ? snap.data() as ScheduleConfig : {});
       setLoading(false);
     });
     return () => unsub();
@@ -73,14 +81,14 @@ export default function HorarioConfig() {
               </label>
               <Input
                 type="text"
-                value={config[dia]?.[0]?.start || ""}
+                value={config ? config[dia]?.[0]?.start || "" : ""}
                 placeholder="Ej: 09:00"
                 onChange={e => {
-                  setConfig((c: any) => ({
+                  setConfig((c) => ({
                     ...c,
                     [dia]: [{
                       start: e.target.value,
-                      end: c[dia]?.[0]?.end || ""
+                      end: c && c[dia]?.[0]?.end || ""
                     }]
                   }));
                 }}
@@ -89,13 +97,13 @@ export default function HorarioConfig() {
               <span className="mx-1 text-gray-400 font-bold text-base sm:text-lg">a</span>
               <Input
                 type="text"
-                value={config[dia]?.[0]?.end || ""}
+                value={config ? config[dia]?.[0]?.end || "" : ""}
                 placeholder="Ej: 18:00"
                 onChange={e => {
-                  setConfig((c: any) => ({
+                  setConfig((c) => ({
                     ...c,
                     [dia]: [{
-                      start: c[dia]?.[0]?.start || "",
+                      start: c && c[dia]?.[0]?.start || "",
                       end: e.target.value
                     }]
                   }));
@@ -110,17 +118,21 @@ export default function HorarioConfig() {
         <div className="mt-8">
           <h3 className="font-semibold mb-3 text-gray-800 text-center text-base sm:text-lg">Días bloqueados <span className="font-normal text-gray-500">(feriados)</span>:</h3>
           <div className="flex gap-2 mb-3 flex-wrap justify-center">
-            {(config.bloqueados || []).map((fecha: string, i: number) => (
+            {(config && config.bloqueados ? config.bloqueados : []).map((fecha: string, i: number) => (
               <span key={fecha} className="inline-flex items-center bg-gradient-to-r from-red-100 to-red-200 text-red-700 rounded-full px-3 py-1 text-xs font-medium shadow-sm border border-red-200 mb-2">
                 {fecha}
                 <button
                   type="button"
                   className="ml-2 text-red-400 hover:text-red-600 font-bold text-base"
                   onClick={() => {
-                    setConfig((c: any) => ({
-                      ...c,
-                      bloqueados: c.bloqueados.filter((f: string) => f !== fecha)
-                    }));
+                    setConfig((c) => {
+                      if (!c) return { bloqueados: [] } as ScheduleConfig;
+                      const { bloqueados = [], ...rest } = c;
+                      return {
+                        ...rest,
+                        bloqueados: bloqueados.filter((f: string) => f !== fecha)
+                      } as ScheduleConfig;
+                    });
                   }}
                   aria-label="Eliminar feriado"
                 >✕</button>
@@ -159,10 +171,14 @@ export default function HorarioConfig() {
               onClick={() => {
                 if (selectedDate) {
                   const value = selectedDate.toISOString().slice(0, 10);
-                  setConfig((c: any) => ({
-                    ...c,
-                    bloqueados: [...(c.bloqueados || []), value]
-                  }));
+                  setConfig((c) => {
+                    if (!c) return { bloqueados: [value] } as ScheduleConfig;
+                    const { bloqueados = [], ...rest } = c;
+                    return {
+                      ...rest,
+                      bloqueados: [...bloqueados, value]
+                    } as ScheduleConfig;
+                  });
                   setSelectedDate(undefined);
                   setShowCalendar(false);
                 }

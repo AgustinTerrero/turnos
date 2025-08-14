@@ -39,7 +39,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 export default function DateStep({ onSelect, selectedDate, onBack }: Props) {
   const [weekOffset, setWeekOffset] = useState(0);
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<Record<string, { start: string; end: string }[] | undefined> & { bloqueados?: string[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const today = new Date();
   const monday = getMondayOfWeek(new Date(today.getFullYear(), today.getMonth(), today.getDate() + weekOffset * 7));

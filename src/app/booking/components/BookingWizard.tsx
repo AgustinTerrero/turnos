@@ -12,7 +12,6 @@ type WizardState = {
   date: string | null;
   time: string | null;
   name?: string;
-  email?: string;
   phone?: string;
   wantsWhatsappReminder?: boolean;
 };
@@ -103,7 +102,7 @@ const BookingWizard: React.FC = () => {
               setState((s) => ({ ...s, name, phone, wantsWhatsappReminder }));
               setSaved(true);
               setStep(5);
-            } catch (e: any) {
+            } catch (e) {
               console.error('Error al guardar el turno:', e);
               setError('Error al guardar el turno. Intenta nuevamente.');
             } finally {
