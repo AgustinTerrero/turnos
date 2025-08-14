@@ -14,6 +14,7 @@ type WizardState = {
   name?: string;
   email?: string;
   phone?: string;
+  wantsWhatsappReminder?: boolean;
 };
 
 
@@ -81,27 +82,29 @@ const BookingWizard: React.FC = () => {
       <div className="max-w-xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <DetailsStep
-          defaultValues={{ name: state.name || '', email: state.email || '', phone: state.phone || '' }}
-          onSubmit={async ({ name, email, phone }) => {
+          defaultValues={{ name: state.name || '', phone: state.phone || '' }}
+          onSubmit={async ({ name, phone, wantsWhatsappReminder }) => {
             setSaving(true);
             setError(null);
             try {
               const { db } = await import("@/lib/firebase");
               const { addDoc, collection } = await import("firebase/firestore");
+              const serviceName = state.service?.nombre || state.service?.name || '';
               await addDoc(collection(db, 'appointments'), {
-                service: state.service?.name,
+                service: serviceName,
                 serviceId: state.service?.id,
                 date: state.date,
                 time: state.time,
                 name,
-                email,
                 phone,
+                wantsWhatsappReminder,
                 createdAt: new Date()
               });
-              setState((s) => ({ ...s, name, email, phone }));
+              setState((s) => ({ ...s, name, phone, wantsWhatsappReminder }));
               setSaved(true);
               setStep(5);
             } catch (e: any) {
+              console.error('Error al guardar el turno:', e);
               setError('Error al guardar el turno. Intenta nuevamente.');
             } finally {
               setSaving(false);
@@ -116,17 +119,17 @@ const BookingWizard: React.FC = () => {
   }
 
   // Paso 5: Confirmación
-  if (step === 5 && state.service && state.date && state.time && state.name && state.email && state.phone && saved) {
+  if (step === 5 && state.service && state.date && state.time && state.name && state.phone && saved) {
     return (
       <div className="max-w-xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <ConfirmStep
-          service={state.service.name}
+          service={state.service.name || ''}
           date={state.date}
           time={state.time}
           name={state.name}
-          email={state.email}
           phone={state.phone}
+          wantsWhatsappReminder={state.wantsWhatsappReminder}
           onNew={() => {
             setState({ service: null, date: null, time: null });
             setSaved(false);
