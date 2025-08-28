@@ -100,7 +100,7 @@ export default function TurnosTable({ turnos, loading }: Props) {
             <button
               key={rango}
               className={`px-4 py-1 rounded-full border text-sm font-semibold transition-all shadow-sm ${filtroRango === rango ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
-              onClick={() => setFiltroRango(filtroRango === rango ? null : rango as any)}
+              onClick={() => setFiltroRango(filtroRango === rango ? null : rango as 'hoy' | 'semana' | 'mes')}
             >
               {rango === 'hoy' ? 'Hoy' : rango === 'semana' ? 'Semana' : 'Mes'}
             </button>
