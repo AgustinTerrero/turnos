@@ -6,6 +6,7 @@ import DateStep from './DateStep';
 import TimeStep from './TimeStep';
 import DetailsStep from './DetailsStep';
 import ConfirmStep from './ConfirmStep';
+import StepBar from './StepBar';
 
 type WizardState = {
   service: Service | null;
@@ -24,10 +25,28 @@ const BookingWizard: React.FC = () => {
   const [saved, setSaved] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Configuración de pasos y opciones elegidas
+  const steps = ["Servicio", "Fecha", "Hora", "Datos", "Confirmación"];
+  // completedSteps sólo hasta el paso anterior al actual
+  const completedSteps: { [key: number]: boolean } = {
+    1: step > 1 && !!state.service,
+    2: step > 2 && !!state.date,
+    3: step > 3 && !!state.time,
+    4: step > 4 && !!state.name && !!state.phone,
+    5: step > 5 && saved,
+  };
+  const chosenOptions: { [key: number]: string } = {
+    1: state.service?.nombre || state.service?.name || "",
+    2: state.date ? state.date.split("-").reverse().join("/") : "",
+    3: state.time || "",
+    4: state.name || "",
+  };
+
   // Paso 1: Selección de servicio
   if (step === 1) {
     return (
       <div className="max-w-xl mx-auto p-6">
+        <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <ServiceStep
           selectedId={state.service?.id}
@@ -44,6 +63,7 @@ const BookingWizard: React.FC = () => {
   if (step === 2) {
     return (
       <div className="max-w-xl mx-auto p-6">
+        <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <DateStep
           selectedDate={state.date || undefined}
@@ -61,6 +81,7 @@ const BookingWizard: React.FC = () => {
   if (step === 3 && state.date) {
     return (
       <div className="max-w-xl mx-auto p-6">
+        <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <TimeStep
           date={state.date}
@@ -79,6 +100,7 @@ const BookingWizard: React.FC = () => {
   if (step === 4 && state.service && state.date && state.time) {
     return (
       <div className="max-w-xl mx-auto p-6">
+        <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <DetailsStep
           defaultValues={{ name: state.name || '', phone: state.phone || '' }}
@@ -121,9 +143,10 @@ const BookingWizard: React.FC = () => {
   if (step === 5 && state.service && state.date && state.time && state.name && state.phone && saved) {
     return (
       <div className="max-w-xl mx-auto p-6">
+        <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
         <h1 className="text-2xl font-bold mb-4">Reservá tu turno</h1>
         <ConfirmStep
-          service={state.service.name || ''}
+          service={state.service.nombre || state.service.name || ''}
           date={state.date}
           time={state.time}
           name={state.name}

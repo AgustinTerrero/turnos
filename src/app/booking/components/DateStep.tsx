@@ -85,28 +85,38 @@ export default function DateStep({ onSelect, selectedDate, onBack }: Props) {
           <ChevronLeftIcon className="w-6 h-6" />
         </button>
         <div className="flex gap-3 flex-wrap justify-center w-full max-w-xl">
-          {days.map((d) => {
-            const iso = d.toISOString().slice(0, 10);
-            const label = `${daysOfWeek[d.getDay() === 0 ? 6 : d.getDay() - 1]} ${d.getDate()}`;
-            const blocked = loading ? false : isDayBlocked(d);
-            return (
-              <button
-                key={iso}
-                onClick={() => !blocked && onSelect(iso)}
-                disabled={blocked}
-                className={`transition rounded-xl px-5 py-4 font-semibold text-lg shadow border-2 focus:outline-none focus:ring-2 focus:ring-primary-400
-                  ${selectedDate === iso
-                    ? 'bg-gradient-to-br from-primary-500 to-primary-400 text-white border-primary-500 scale-105 shadow-xl'
-                    : blocked
-                      ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
-                      : 'bg-white border-gray-200 hover:scale-105 hover:border-primary-400 hover:shadow-md text-gray-900'}
-                `}
-                style={{ background: selectedDate === iso ? 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)' : undefined }}
-              >
-                {label}
-              </button>
-            );
-          })}
+            {days.map((d) => {
+              const iso = d.toISOString().slice(0, 10);
+              const label = `${daysOfWeek[d.getDay() === 0 ? 6 : d.getDay() - 1]} ${d.getDate()}`;
+              const blocked = loading ? false : isDayBlocked(d);
+              const isSelected = selectedDate === iso;
+              return (
+                <button
+                  key={iso}
+                  onClick={() => !blocked && onSelect(iso)}
+                  disabled={blocked}
+                  className={`transition relative rounded-xl px-5 py-4 font-semibold text-lg shadow border-2 focus:outline-none focus:ring-2 focus:ring-primary-400
+                    ${isSelected
+                      ? 'bg-gradient-to-br from-primary-500 to-primary-400 text-white border-primary-500 scale-105 shadow-xl'
+                      : blocked
+                        ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
+                        : 'bg-white border-gray-200 hover:scale-105 hover:border-primary-400 hover:shadow-md text-gray-900'}
+                  `}
+                  style={isSelected ? { background: 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)' } : {}}
+                >
+                  {isSelected && (
+                    <span className="absolute top-2 right-2 text-white bg-green-500 rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-fade-in">
+                      <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#22c55e" opacity="0.15"/><path d="M5 9.5l2.5 2.5L13 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                  )}
+                  {label}
+                </button>
+              );
+            })}
+            <style>{`
+              @keyframes fade-in { from { opacity: 0; transform: scale(0.7);} to { opacity: 1; transform: scale(1);} }
+              .animate-fade-in { animation: fade-in 0.3s; }
+            `}</style>
         </div>
         <button
           className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
@@ -122,6 +132,10 @@ export default function DateStep({ onSelect, selectedDate, onBack }: Props) {
       >
         ← Volver
       </button>
+        <style>{`
+          @keyframes fade-in { from { opacity: 0; transform: scale(0.7);} to { opacity: 1; transform: scale(1);} }
+          .animate-fade-in { animation: fade-in 0.3s; }
+        `}</style>
     </div>
   );
 }

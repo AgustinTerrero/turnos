@@ -26,14 +26,25 @@ export default function ConfirmStep({ service, date, time, name, phone, wantsWha
   return (
     <div className="flex justify-center items-center min-h-[60vh]">
       <div className="bg-white shadow-xl rounded-2xl px-8 py-10 max-w-md w-full text-center border border-gray-100">
-        <div className="flex justify-center mb-4">
-          <AnimatedCheckmark size={72} color="#4f46e5" />
+        <div className="flex justify-center mb-4 animate-bounce-in">
+          <AnimatedCheckmark size={120} color="#22c55e" />
         </div>
-        <h1 className="text-2xl font-extrabold mb-2 tracking-tight text-gray-900">Reservá tu turno</h1>
-        <h2 className="text-xl font-bold mb-4 text-primary-700">¡Turno Confirmado!</h2>
+        <h1 className="text-3xl font-extrabold mb-2 tracking-tight text-green-700 flex items-center justify-center gap-2">¡Tu turno está reservado! <span className="text-3xl"></span></h1>
+        <div className="mb-4 text-lg text-gray-700 font-semibold">Nos vemos pronto</div>
         <div className="mb-2 font-semibold text-lg text-primary-800">{service}</div>
         <div className="mb-2 text-gray-700">{date.split("-").reverse().join("/")} • {time}</div>
-  <div className="mb-4 text-gray-500 text-sm">{name} | {phone}</div>
+        <div className="mb-4 text-gray-500 text-sm">{name} | {phone}</div>
+        <style>{`
+          @keyframes bounce-in {
+            0% { transform: scale(0.7); opacity: 0; }
+            60% { transform: scale(1.15); opacity: 1; }
+            80% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+          }
+          .animate-bounce-in {
+            animation: bounce-in 0.8s cubic-bezier(0.68,-0.55,0.27,1.55);
+          }
+        `}</style>
         <div className="flex flex-col gap-3 mb-6">
           <a
             href={calendarUrl}

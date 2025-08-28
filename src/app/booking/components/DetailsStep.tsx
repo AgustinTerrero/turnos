@@ -14,6 +14,10 @@ export default function DetailsStep({ onSubmit, onBack, defaultValues }: Props) 
   const [name, setName] = useState(defaultValues?.name || "");
   const [phone, setPhone] = useState(defaultValues?.phone || "");
   const [wantsWhatsappReminder, setWantsWhatsappReminder] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+
+  // Validación simple de teléfono (puedes ajustar la regex para tu país)
+  const phoneValid = /^\+?\d{7,15}$/.test(phone.replace(/\s|-/g, ""));
 
   return (
     <div className="flex justify-center items-center min-h-[60vh]">
@@ -21,6 +25,7 @@ export default function DetailsStep({ onSubmit, onBack, defaultValues }: Props) 
         className="bg-white shadow-xl rounded-2xl px-8 py-10 max-w-md w-full text-center border border-gray-100"
         onSubmit={e => {
           e.preventDefault();
+          if (!phoneValid) return;
           onSubmit({ name, phone, wantsWhatsappReminder });
         }}
       >
@@ -33,13 +38,24 @@ export default function DetailsStep({ onSubmit, onBack, defaultValues }: Props) 
             required
             className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 text-base focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition"
           />
-          <Input
-            placeholder="Teléfono"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-            required
-            className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 text-base focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition"
-          />
+          <div className="relative">
+            <Input
+              placeholder="Teléfono"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              onBlur={() => setPhoneTouched(true)}
+              required
+              className={`rounded-xl bg-gray-50 border px-4 py-3 text-base focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition ${phoneTouched && !phoneValid ? 'border-red-400 ring-red-200' : 'border-gray-200'}`}
+            />
+            {phone && phoneTouched && (
+              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-lg ${phoneValid ? 'text-green-500' : 'text-red-400'}`}>
+                {phoneValid ? '✔' : '✗'}
+              </span>
+            )}
+            {phoneTouched && !phoneValid && (
+              <div className="text-xs text-red-500 mt-1 text-left">Ingresá un teléfono válido (ej: +5491122334455)</div>
+            )}
+          </div>
         </div>
         <div className="flex items-center justify-center gap-3 mb-8">
           <Switch id="whatsapp-reminder" checked={wantsWhatsappReminder} onCheckedChange={setWantsWhatsappReminder} />
@@ -53,6 +69,7 @@ export default function DetailsStep({ onSubmit, onBack, defaultValues }: Props) 
             type="submit"
             className="w-1/2 py-3 rounded-lg text-base font-semibold bg-primary-500 text-white hover:bg-primary-600 transition"
             style={{ background: 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)', color: '#fff', border: 'none' }}
+            disabled={!phoneValid}
           >
             Reservar turno
           </Button>

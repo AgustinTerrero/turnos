@@ -91,23 +91,36 @@ const TimeStep: React.FC<Props> = ({ onSelect, selectedTime, onBack, date }) => 
         <div className="mb-4 text-lg text-gray-500">Cargando horarios...</div>
       ) : (
         <div className="flex gap-3 mb-8 flex-wrap justify-center w-full max-w-xl">
-          {slots.length ? slots.map((slot) => (
-            <button
-              key={slot}
-              onClick={() => !reserved.has(slot) && onSelect(slot)}
-              disabled={reserved.has(slot)}
-              className={`transition rounded-xl px-5 py-4 font-semibold text-lg shadow border-2 focus:outline-none focus:ring-2 focus:ring-primary-400
-                ${selectedTime === slot
-                  ? 'bg-gradient-to-br from-primary-500 to-primary-400 text-white border-primary-500 scale-105 shadow-xl'
-                  : reserved.has(slot)
-                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
-                    : 'bg-white border-gray-200 hover:scale-105 hover:border-primary-400 hover:shadow-md text-gray-900'}
-              `}
-              style={{ background: selectedTime === slot ? 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)' : undefined }}
-            >
-              {slot}
-            </button>
-          )) : <div className="text-gray-400">No hay horarios disponibles este día.</div>}
+          {slots.length ? slots.map((slot) => {
+            const isSelected = selectedTime === slot;
+            const isReserved = reserved.has(slot);
+            return (
+              <button
+                key={slot}
+                onClick={() => !isReserved && onSelect(slot)}
+                disabled={isReserved}
+                className={`transition relative rounded-xl px-5 py-4 font-semibold text-lg shadow border-2 focus:outline-none focus:ring-2 focus:ring-primary-400
+                  ${isSelected
+                    ? 'bg-gradient-to-br from-primary-500 to-primary-400 text-white border-primary-500 scale-105 shadow-xl'
+                    : isReserved
+                      ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
+                      : 'bg-white border-gray-200 hover:scale-105 hover:border-primary-400 hover:shadow-md text-gray-900'}
+                `}
+                style={{ background: isSelected ? 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)' : undefined }}
+              >
+                {isSelected && (
+                  <span className="absolute top-2 right-2 text-white bg-green-500 rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-fade-in">
+                    <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#22c55e" opacity="0.15"/><path d="M5 9.5l2.5 2.5L13 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                )}
+                {slot}
+              </button>
+            );
+          }) : <div className="text-gray-400">No hay horarios disponibles este día.</div>}
+          <style>{`
+            @keyframes fade-in { from { opacity: 0; transform: scale(0.7);} to { opacity: 1; transform: scale(1);} }
+            .animate-fade-in { animation: fade-in 0.3s; }
+          `}</style>
         </div>
       )}
       <button
