@@ -33,7 +33,7 @@ export default function ServiciosManager() {
   useEffect(() => {
     const drop = dropRef.current;
     if (!drop) return;
-    const prevent = (e: any) => { e.preventDefault(); e.stopPropagation(); };
+  const prevent = (e: DragEvent) => { e.preventDefault(); e.stopPropagation(); };
     drop.addEventListener('dragover', prevent);
     drop.addEventListener('dragenter', prevent);
     drop.addEventListener('drop', prevent);
