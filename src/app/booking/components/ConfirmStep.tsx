@@ -1,7 +1,12 @@
 // Paso 5: Confirmación de turno
 import { Button } from "@/components/ui/button";
+  // WhatsApp info
+  const whatsappNumber = "5491123456789"; // Reemplaza por el número real
+  const whatsappMsg = encodeURIComponent("Hola, quiero cambiar mi turno o me equivoqué de día.");
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMsg}`;
+
 import React from "react";
-import { CalendarDaysIcon } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
 import AnimatedCheckmark from "./AnimatedCheckmark";
 
 type Props = {
@@ -56,6 +61,19 @@ export default function ConfirmStep({ service, date, time, name, phone, wantsWha
             <CalendarDaysIcon className="w-6 h-6" />
             Agregar a Google Calendar
           </a>
+          <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 flex flex-col items-center mt-2">
+            <div className="text-primary-800 font-semibold mb-1 text-base">¿Querés cambiar tu turno o te equivocaste de día?</div>
+            <div className="text-primary-700 text-sm mb-3 text-center">Hablános por WhatsApp y te ayudamos a modificar tu reserva.</div>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow text-base bg-green-500 hover:bg-green-600 text-white transition"
+            >
+              <ChatBubbleLeftRightIcon className="w-6 h-6" />
+              Hablános por WhatsApp
+            </a>
+          </div>
         </div>
         <Button
           onClick={onNew}

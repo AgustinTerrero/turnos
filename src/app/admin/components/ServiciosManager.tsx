@@ -1,5 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+// API key de imgbb proporcionada por el usuario
+const IMGBB_API_KEY = "5140e73526fd6bc076485326ba259cce";
 import { toast } from "sonner";
 import { db } from "@/lib/firebase";
 import {
@@ -15,6 +17,7 @@ interface Servicio {
   id: string;
   nombre: string;
   duracion: number; // minutos
+  imagen?: string; // url de imagen descriptiva
 }
 
 export default function ServiciosManager() {
@@ -22,6 +25,41 @@ export default function ServiciosManager() {
   const [nombre, setNombre] = useState("");
   const [duracion, setDuracion] = useState(30);
   const [editId, setEditId] = useState<string | null>(null);
+  const [imagen, setImagen] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  // Drag & drop handlers
+  useEffect(() => {
+    const drop = dropRef.current;
+    if (!drop) return;
+    const prevent = (e: any) => { e.preventDefault(); e.stopPropagation(); };
+    drop.addEventListener('dragover', prevent);
+    drop.addEventListener('dragenter', prevent);
+    drop.addEventListener('drop', prevent);
+    return () => {
+      drop.removeEventListener('dragover', prevent);
+      drop.removeEventListener('dragenter', prevent);
+      drop.removeEventListener('drop', prevent);
+    };
+  }, []);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    const form = new FormData();
+    form.append('image', file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: form,
+    });
+    const data = await res.json();
+    if (data.success) {
+      setImagen(data.data.url);
+    } else {
+      alert('Error al subir imagen');
+    }
+    setUploading(false);
+  };
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,25 +76,29 @@ export default function ServiciosManager() {
     e.preventDefault();
     if (!nombre.trim()) return;
     if (editId) {
-      await updateDoc(doc(db, "servicios", editId), {
-        nombre,
-        duracion,
-      });
-    } else {
-      await addDoc(collection(db, "servicios"), {
-        nombre,
-        duracion,
-      });
-    }
+    await updateDoc(doc(db, "servicios", editId), {
+      nombre,
+      duracion,
+      imagen,
+    });
+  } else {
+    await addDoc(collection(db, "servicios"), {
+      nombre,
+      duracion,
+      imagen,
+    });
+  }
     setNombre("");
     setDuracion(30);
     setEditId(null);
+  setImagen("");
   };
 
   const handleEdit = (servicio: Servicio) => {
     setEditId(servicio.id);
     setNombre(servicio.nombre);
     setDuracion(servicio.duracion);
+  setImagen(servicio.imagen || "");
   };
 
   const handleDelete = (id: string) => {
@@ -96,6 +138,35 @@ export default function ServiciosManager() {
           required
           placeholder="Duración (min)"
         />
+        <div
+          ref={dropRef}
+          className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl px-4 py-4 min-w-[180px] cursor-pointer transition-all ${uploading ? 'opacity-60 pointer-events-none' : 'hover:border-indigo-400'}`}
+          onClick={() => !uploading && document.getElementById('file-input-servicio')?.click()}
+          onDrop={async (e) => {
+            e.preventDefault();
+            if (uploading) return;
+            const file = e.dataTransfer.files[0];
+            if (file) await handleFile(file);
+          }}
+        >
+          {imagen ? (
+            <img src={imagen} alt="Imagen servicio" className="w-20 h-20 object-cover rounded-lg mb-2 border shadow" />
+          ) : (
+            <span className="text-gray-400 text-sm">Arrastra una imagen aquí o haz click</span>
+          )}
+          <input
+            id="file-input-servicio"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={uploading}
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (file) await handleFile(file);
+            }}
+          />
+          {uploading && <span className="text-xs text-indigo-500 mt-1">Subiendo imagen...</span>}
+        </div>
         <button
           className="px-6 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-violet-600 transition text-base outline-none"
           type="submit"
@@ -110,6 +181,7 @@ export default function ServiciosManager() {
               setEditId(null);
               setNombre("");
               setDuracion(30);
+              setImagen("");
             }}
           >
             Cancelar
@@ -124,6 +196,7 @@ export default function ServiciosManager() {
             <thead>
               <tr className="bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700">
                 <th className="p-3 font-bold text-left">Nombre</th>
+                <th className="p-3 font-bold text-left">Imagen</th>
                 <th className="p-3 font-bold text-left">Duración (min)</th>
                 <th className="p-3 font-bold text-center">Acción</th>
               </tr>
@@ -134,6 +207,7 @@ export default function ServiciosManager() {
                   `border-t ${idx % 2 === 0 ? 'bg-white/80' : 'bg-gray-50/80'} hover:bg-primary-50/60 transition`}
                 >
                   <td className="p-3">{s.nombre}</td>
+                  <td className="p-3">{s.imagen && <img src={s.imagen} alt={s.nombre} className="w-14 h-14 object-cover rounded-lg border" />}</td>
                   <td className="p-3">{s.duracion}</td>
                   <td className="p-3 flex gap-2 justify-center">
                     <button

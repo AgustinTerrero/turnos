@@ -17,7 +17,7 @@ export default function AnimatedCheckmark({ size = 120, color = "#22c55e" }: { s
         r="30"
         stroke={color}
         strokeWidth="5"
-        fill="white"
+        fill="none"
         style={{ filter: 'drop-shadow(0 4px 18px rgba(34,197,94,0.25))' }}
       />
       <path

@@ -1,6 +1,8 @@
 // Paso 1: Selección de servicio usando shadcn/ui
 // import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 
@@ -10,6 +12,7 @@ export type Service = {
   duration?: number;
   nombre?: string;
   duracion?: number;
+  imagen?: string;
 };
 
 
@@ -42,15 +45,28 @@ export default function ServiceStep({ onSelect, selectedId }: Props) {
             <button
               key={s.id}
               onClick={() => onSelect(s)}
-              className={`transition group w-full rounded-2xl shadow-lg px-6 py-8 flex flex-col items-center border-2 focus:outline-none focus:ring-2 focus:ring-primary-400 font-semibold text-lg cursor-pointer
+              className={`transition group w-full rounded-2xl p-0 border-2 focus:outline-none focus:ring-2 focus:ring-primary-400 font-semibold text-lg cursor-pointer overflow-hidden
                 ${selectedId === s.id
                   ? 'bg-gradient-to-br from-primary-500 to-primary-400 text-white border-primary-500 scale-105 shadow-xl'
                   : 'bg-white border-gray-200 hover:scale-105 hover:border-primary-400 hover:shadow-md text-gray-900'}
               `}
               style={{ background: selectedId === s.id ? 'linear-gradient(90deg, #6366f1 0%, #818cf8 100%)' : undefined }}
             >
-              <span className="font-bold text-xl mb-2 text-center">{s.nombre || s.name}</span>
-              <span className={`text-sm font-normal ${selectedId === s.id ? 'text-white/80' : 'text-gray-500'}`}>{s.duracion || s.duration} min</span>
+              <Card className="w-full h-[340px] flex flex-col bg-transparent border-0 shadow-none p-0 overflow-hidden">
+                <div style={{height: '70%'}} className="w-full flex-shrink-0">
+                  {s.imagen ? (
+                    <img src={s.imagen} alt={s.nombre || s.name} className="w-full h-full object-cover rounded-t-xl" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-t-xl">
+                      <PhotoIcon className="w-16 h-16 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+                <CardContent className="flex flex-col items-center justify-center py-3 h-[20%] flex-1">
+                  <CardTitle className="text-xl font-bold mb-1 text-center">{s.nombre || s.name}</CardTitle>
+                  <CardDescription className={`text-base font-normal ${selectedId === s.id ? 'text-white/80' : 'text-gray-500'}`}>{s.duracion || s.duration} min</CardDescription>
+                </CardContent>
+              </Card>
             </button>
           ))}
         </div>

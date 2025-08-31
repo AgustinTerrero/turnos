@@ -62,6 +62,16 @@ export default function DateStep({ onSelect, selectedDate, onBack }: Props) {
   function isDayBlocked(date: Date) {
     const iso = date.toISOString().slice(0, 10);
     if (bloqueados.includes(iso)) return true;
+    // Bloquear días pasados de la semana actual
+    const todayDate = new Date();
+    todayDate.setHours(0,0,0,0);
+    if (
+      date < todayDate &&
+      date >= getMondayOfWeek(todayDate) &&
+      date <= todayDate
+    ) {
+      return true;
+    }
     // Verifica si hay horario para ese día
     const dias = ["domingo","lunes","martes","miercoles","jueves","viernes","sabado"];
     const dia = dias[date.getDay()];
