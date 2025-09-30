@@ -95,6 +95,17 @@ export default function HorarioConfig() {
           ))}
         </div>
 
+                {/* Botón para guardar horarios */}
+        <Button
+          type="button"
+          className="mt-2 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-xl py-2 shadow transition-all"
+          onClick={() => {
+            if (config) handleSave(config);
+          }}
+        >
+          Guardar horarios
+        </Button>
+
         {/* Bloqueo de días específicos */}
         <div className="mt-8">
           <h3 className="font-semibold mb-3 text-gray-800 text-center text-base sm:text-lg">Días bloqueados <span className="font-normal text-gray-500">(feriados)</span>:</h3>
