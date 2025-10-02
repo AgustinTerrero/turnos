@@ -73,41 +73,59 @@ export default function AdminPanel() {
   const [settingsTab, setSettingsTab] = useState<'horarios' | 'servicios'>('horarios');
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-      const unsub = onSnapshot(
-        q,
-        (snap) => {
-          setTurnos(
-            snap.docs.map((doc) => {
-              const data = doc.data();
-              return {
-                id: doc.id,
-                service: data.service || '',
-                date: data.date || '',
-                time: data.time || '',
-                name: data.name || '',
-                email: data.email || '',
-                phone: data.phone || '',
-                wantsWhatsappReminder: data.wantsWhatsappReminder || false,
-                status: data.status || 'pendiente',
-              };
-            })
-          );
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error loading appointments:", error);
-          setLoading(false);
+    let unsub: (() => void) | undefined;
+    
+    const setupListener = async () => {
+      try {
+        // Verificar que db esté disponible
+        if (!db) {
+          throw new Error("Firebase no está inicializado");
         }
-      );
-      return () => unsub();
-    } catch (error) {
-      console.error("Error setting up listener:", error);
-      setLoading(false);
-    }
+
+        const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+        unsub = onSnapshot(
+          q,
+          (snap) => {
+            setTurnos(
+              snap.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                  id: doc.id,
+                  service: data.service || '',
+                  date: data.date || '',
+                  time: data.time || '',
+                  name: data.name || '',
+                  email: data.email || '',
+                  phone: data.phone || '',
+                  wantsWhatsappReminder: data.wantsWhatsappReminder || false,
+                  status: data.status || 'pendiente',
+                };
+              })
+            );
+            setLoading(false);
+            setError(null);
+          },
+          (err) => {
+            console.error("Error loading appointments:", err);
+            setError(err.message);
+            setLoading(false);
+          }
+        );
+      } catch (err) {
+        console.error("Error setting up listener:", err);
+        setError(err instanceof Error ? err.message : "Error desconocido");
+        setLoading(false);
+      }
+    };
+
+    setupListener();
+
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   return (
@@ -135,6 +153,25 @@ export default function AdminPanel() {
             )}
           </button>
         </div>
+        {/* Error message si falla Firebase */}
+        {error && (
+          <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-red-600 flex-shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <div className="flex-1">
+              <h3 className="font-bold text-red-900 mb-1">Error al cargar datos</h3>
+              <p className="text-sm text-red-700">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-3 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Recargar página
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="transition-all duration-300">
           {showSettings ? (
             <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">

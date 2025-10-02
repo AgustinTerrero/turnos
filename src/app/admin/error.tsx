@@ -12,11 +12,12 @@ export default function AdminError({
 }) {
   useEffect(() => {
     console.error("Error en admin:", error);
+    console.error("Stack trace:", error.stack);
   }, [error]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-white/20">
+      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-lg w-full text-center border border-white/20">
         <div className="mb-6">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
@@ -35,11 +36,22 @@ export default function AdminError({
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Error en panel admin
+            Error en el panel de administración
           </h1>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-sm mb-4">
             No pudimos cargar el panel de administración. Por favor, intenta nuevamente.
           </p>
+          
+          {/* Información técnica del error */}
+          <details className="text-left bg-gray-50 rounded-lg p-3 mb-4">
+            <summary className="cursor-pointer text-xs font-semibold text-gray-700 mb-2">
+              Detalles técnicos (para debugging)
+            </summary>
+            <div className="text-xs text-gray-600 font-mono break-words">
+              <p className="mb-1"><strong>Error:</strong> {error.message}</p>
+              {error.digest && <p className="mb-1"><strong>ID:</strong> {error.digest}</p>}
+            </div>
+          </details>
         </div>
 
         <div className="space-y-3">
@@ -57,6 +69,10 @@ export default function AdminError({
             Volver al inicio
           </Button>
         </div>
+        
+        <p className="text-xs text-gray-500 mt-4">
+          Si el problema persiste, revisa la consola del navegador (F12)
+        </p>
       </div>
     </div>
   );

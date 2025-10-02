@@ -1,5 +1,5 @@
 // Firebase config and initialization for React
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -12,7 +12,8 @@ const firebaseConfig = {
   appId: "1:818695490074:web:dfff46889bf0c729469fa3"
 };
 
-const app = initializeApp(firebaseConfig);
+// Evita inicializar Firebase múltiples veces
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 const auth = getAuth(app);
 
