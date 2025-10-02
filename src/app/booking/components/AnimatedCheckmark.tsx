@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 export default function AnimatedCheckmark({ size = 120, color = "#22c55e" }: { size?: number; color?: string }) {
@@ -9,7 +10,7 @@ export default function AnimatedCheckmark({ size = 120, color = "#22c55e" }: { s
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="animate-checkmark-bounce"
-      style={{ display: 'block', margin: '0 auto' }}
+      style={{ display: 'block', margin: '0 auto', overflow: 'visible' }}
     >
       <circle
         cx="32"

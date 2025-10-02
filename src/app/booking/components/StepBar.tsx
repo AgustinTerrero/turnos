@@ -1,4 +1,5 @@
 import React from "react";
+import { CheckIcon } from "@heroicons/react/24/solid";
 
 interface StepBarProps {
   steps: string[];
@@ -12,48 +13,44 @@ const StepBar: React.FC<StepBarProps> = ({ steps, currentStep, completedSteps, c
   const realCompleted = (idx: number) => idx + 1 < currentStep ? completedSteps[idx + 1] : false;
 
   return (
-    <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent mb-8">
-      <div className="flex flex-row items-center min-w-0 justify-between px-2 gap-0">
+    <div className="w-full overflow-x-auto mb-8 sm:mb-10 -mx-2 px-2 sm:mx-0 sm:px-0">
+      <div className="flex flex-row items-start min-w-[600px] sm:min-w-0 justify-between px-1 sm:px-2 gap-1 sm:gap-2">
         {steps.map((step, idx) => {
           const isActive = currentStep === idx + 1;
           const isCompleted = realCompleted(idx);
           return (
             <React.Fragment key={step}>
-              <div className="flex flex-col items-center min-w-0 max-w-[90px] sm:max-w-none">
-                <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center min-w-[80px] sm:min-w-0 sm:max-w-none flex-1">
+                <div className="flex flex-col items-center w-full">
                   <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200 relative select-none
-                      ${isCompleted ? 'bg-green-500 border-green-500 text-white' :
-                        isActive ? 'bg-white border-primary-600 text-primary-700' :
-                        'bg-white border-gray-300 text-gray-400'}
+                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300 relative select-none shadow-sm
+                      ${isCompleted ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-emerald-200' :
+                        isActive ? 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-indigo-200' :
+                        'bg-gray-100 text-gray-400 border-2 border-gray-200'}
                     `}
-                    style={{ boxSizing: 'border-box', verticalAlign: 'middle', padding: 0 }}
                   >
                     {isCompleted ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="block" style={{ display: 'block' }}>
-                        <circle cx="12" cy="12" r="11" fill="#22c55e" opacity="0.15"/>
-                        <path d="M7 13l3 3 7-7" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <CheckIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                     ) : (
-                      <span className="text-base font-bold flex items-center justify-center w-full h-full" style={{ lineHeight: '40px' }}>{idx + 1}</span>
+                      <span className="text-base sm:text-lg font-bold">{idx + 1}</span>
                     )}
                   </div>
-                  <span className={`mt-2 text-xs sm:text-[13px] font-medium ${isActive ? 'text-primary-700 font-bold' : isCompleted ? 'text-green-700' : 'text-gray-400'}`}>{step}</span>
+                  <span className={`mt-2 sm:mt-3 text-[10px] sm:text-xs md:text-sm font-semibold text-center transition-colors duration-200 leading-tight ${isActive ? 'text-indigo-700' : isCompleted ? 'text-emerald-700' : 'text-gray-500'}`}>{step}</span>
                   {chosenOptions[idx + 1] && (
-                    <span className="mt-1 text-[11px] sm:text-xs text-gray-400 max-w-[70px] sm:max-w-[80px] truncate">{chosenOptions[idx + 1]}</span>
+                    <span className="mt-0.5 sm:mt-1 text-[9px] sm:text-[10px] md:text-xs text-gray-400 max-w-[70px] sm:max-w-[80px] md:max-w-[100px] truncate text-center">{chosenOptions[idx + 1]}</span>
                   )}
                 </div>
               </div>
               {idx !== steps.length - 1 && (
-                <div className="flex-1 h-1 mx-2 relative flex items-center">
-                  {/* Línea base continua */}
-                  <div className="absolute left-0 top-1/2 w-full h-1 bg-gray-200 rounded" style={{ transform: 'translateY(-50%)' }} />
-                  {/* Línea de progreso encima */}
+                <div className="flex-1 h-1 mx-1 sm:mx-2 mt-4 sm:mt-5 md:mt-6 relative flex items-center max-w-[40px] sm:max-w-[60px] md:max-w-[100px]">
+                  {/* Línea base */}
+                  <div className="absolute left-0 top-1/2 w-full h-0.5 bg-gray-200 rounded-full" style={{ transform: 'translateY(-50%)' }} />
+                  {/* Línea de progreso */}
                   {isCompleted && (
-                    <div className="absolute left-0 top-1/2 h-1 bg-green-500 rounded" style={{ width: '100%', transform: 'translateY(-50%)' }} />
+                    <div className="absolute left-0 top-1/2 h-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all duration-500" style={{ width: '100%', transform: 'translateY(-50%)' }} />
                   )}
                   {isActive && !isCompleted && (
-                    <div className="absolute left-0 top-1/2 h-1 bg-primary-400 rounded" style={{ width: '50%', transform: 'translateY(-50%)' }} />
+                    <div className="absolute left-0 top-1/2 h-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-500" style={{ width: '50%', transform: 'translateY(-50%)' }} />
                   )}
                 </div>
               )}
@@ -61,17 +58,6 @@ const StepBar: React.FC<StepBarProps> = ({ steps, currentStep, completedSteps, c
           );
         })}
       </div>
-      <style>{`
-        .border-primary-600 { border-color: #6366f1 !important; }
-        .bg-primary-100 { background: #eef2ff !important; }
-        .text-primary-700 { color: #3730a3 !important; }
-        .bg-primary-200 { background: #c7d2fe !important; }
-        .shadow-lg { box-shadow: 0 4px 16px 0 rgba(99,102,241,0.10); }
-        .scrollbar-thin { scrollbar-width: thin; }
-        .scrollbar-thumb-gray-200::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 8px; }
-        .scrollbar-track-transparent::-webkit-scrollbar-track { background: transparent; }
-        .stepbar-active { box-shadow: 0 0 0 4px #c7d2fe; }
-      `}</style>
     </div>
   );
 };

@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="manifest" href="/manifest.json" />
           <meta name="theme-color" content="#0ea5e9" />
@@ -39,6 +39,7 @@ export default function RootLayout({
           className={`
             ${geistSans.variable} ${geistMono.variable} antialiased
           `}
+          suppressHydrationWarning
         >
           <Toaster position="top-center" richColors closeButton />
           {children}

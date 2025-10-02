@@ -29,18 +29,38 @@ function DashboardResumen({ turnos, loading }: { turnos: Turno[], loading: boole
   const cancelados = turnos.filter(t => t.status === 'cancelado').length;
 
   return (
-    <div className="flex flex-wrap gap-4 mb-8">
-      <div className="flex-1 min-w-[180px] bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col items-start shadow-sm">
-        <span className="text-xs text-blue-700 font-semibold mb-1">📊 Turnos de hoy</span>
-        <span className="text-2xl font-bold text-blue-900">{loading ? '--' : turnosHoy.length}</span>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 flex flex-col items-start shadow-lg hover:shadow-xl transition-shadow text-white">
+        <div className="flex items-center justify-between w-full mb-3">
+          <span className="text-sm font-medium opacity-90">Turnos de hoy</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 opacity-80">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          </svg>
+        </div>
+        <span className="text-4xl font-bold">{loading ? '--' : turnosHoy.length}</span>
       </div>
-      <div className="flex-1 min-w-[180px] bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col items-start shadow-sm">
-        <span className="text-xs text-indigo-700 font-semibold mb-1">⏳ Próximo turno</span>
-        <span className="text-base font-bold text-indigo-900">{loading ? '--' : proximoTurno ? `${proximoTurno.date} ${proximoTurno.time} - ${proximoTurno.name}` : 'Sin próximos'}</span>
+      <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-6 flex flex-col items-start shadow-lg hover:shadow-xl transition-shadow text-white">
+        <div className="flex items-center justify-between w-full mb-3">
+          <span className="text-sm font-medium opacity-90">Próximo turno</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 opacity-80">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <span className="text-base font-semibold truncate w-full">{loading ? '--' : proximoTurno ? `${proximoTurno.date} ${proximoTurno.time}` : 'Sin próximos'}</span>
+        {proximoTurno && <span className="text-sm opacity-90 mt-1">{proximoTurno.name}</span>}
       </div>
-      <div className="flex-1 min-w-[180px] bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col items-start shadow-sm">
-        <span className="text-xs text-green-700 font-semibold mb-1">✅ Confirmados vs cancelados</span>
-        <span className="text-base font-bold text-green-900">{loading ? '--' : `${confirmados} / ${cancelados}`}</span>
+      <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-6 flex flex-col items-start shadow-lg hover:shadow-xl transition-shadow text-white">
+        <div className="flex items-center justify-between w-full mb-3">
+          <span className="text-sm font-medium opacity-90">Estado</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 opacity-80">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-bold">{loading ? '--' : confirmados}</span>
+          <span className="text-lg opacity-90">confirmados</span>
+        </div>
+        <span className="text-sm opacity-90 mt-1">{loading ? '--' : cancelados} cancelados</span>
       </div>
     </div>
   );
@@ -79,57 +99,66 @@ export default function AdminPanel() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start" style={{
-      background: 'linear-gradient(120deg, #f0f4ff 0%, #e0e7ff 40%, #f5f7fa 100%)',
-      minHeight: '100vh',
-    }}>
-      <div className="w-full max-w-5xl px-2 sm:px-4 md:px-8 py-6 md:py-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 drop-shadow-sm text-center sm:text-left">Panel de Turnos</h1>
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-1">Panel de Administración</h1>
+            <p className="text-gray-600 text-base">Gestioná turnos, horarios y servicios</p>
+          </div>
           <button
-            className="w-full sm:w-auto px-5 py-2 rounded-lg bg-white/80 border border-gray-200 shadow text-primary-700 font-semibold text-base hover:bg-primary-50 transition flex items-center gap-2 justify-center"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold text-base hover:from-indigo-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 justify-center transform hover:scale-105"
             onClick={() => setShowSettings((v) => !v)}
           >
             {showSettings ? (
               <>
                 <ArrowLeftIcon className="w-5 h-5" />
-                Volver
+                Volver a Turnos
               </>
             ) : (
               <>
                 <Cog6ToothIcon className="w-5 h-5" />
-                Ajustes
+                Configuración
               </>
             )}
           </button>
         </div>
         <div className="transition-all duration-300">
           {showSettings ? (
-            <div className="rounded-2xl border border-gray-200 p-2 sm:p-4 md:p-6 bg-white/90 shadow-xl">
-              <h2 className="text-lg sm:text-xl font-bold mb-4 text-primary-700">Configuración</h2>
-              <div className="flex gap-2 mb-6 justify-center">
+            <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-5">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Cog6ToothIcon className="w-7 h-7" />
+                  Configuración
+                </h2>
+              </div>
+              <div className="flex gap-0 border-b border-gray-200">
                 <button
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all text-base shadow-sm border ${settingsTab === 'horarios' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                  className={`flex-1 px-6 py-4 font-semibold transition-all text-base relative ${settingsTab === 'horarios' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSettingsTab('horarios')}
                 >
-                  Horarios
+                  Horarios y Feriados
+                  {settingsTab === 'horarios' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-indigo-600"></div>}
                 </button>
                 <button
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all text-base shadow-sm border ${settingsTab === 'servicios' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                  className={`flex-1 px-6 py-4 font-semibold transition-all text-base relative ${settingsTab === 'servicios' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSettingsTab('servicios')}
                 >
                   Servicios
+                  {settingsTab === 'servicios' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-indigo-600"></div>}
                 </button>
               </div>
-              <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-100 shadow-sm">
+              <div className="p-6 sm:p-8 bg-gray-50">
                 {settingsTab === 'horarios' ? <HorarioConfig /> : <ServiciosManager />}
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-gray-200 p-2 sm:p-4 md:p-6 bg-white/90 shadow-xl overflow-x-auto">
+            <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">
+              <div className="p-6 sm:p-8">
                 {/* Dashboard resumen */}
                 <DashboardResumen turnos={turnos} loading={loading} />
                 <TurnosTable turnos={turnos} loading={loading} />
+              </div>
             </div>
           )}
         </div>
