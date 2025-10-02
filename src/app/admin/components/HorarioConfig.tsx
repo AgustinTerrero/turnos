@@ -49,11 +49,11 @@ export default function HorarioConfig() {
     }
   }, []);
 
-  // Guardar automáticamente los feriados al cambiar
+  // Guardar configuración
   const handleSave = async (newConfig: ScheduleConfig) => {
     const ref = doc(db, "schedule_config", "main");
     await setDoc(ref, newConfig);
-    toast.success("Feriados actualizados");
+    toast.success("Configuración guardada exitosamente");
   };
 
   if (loading) return (
@@ -78,48 +78,96 @@ export default function HorarioConfig() {
         </div>
         
         <div className="p-6">
-          <div className="grid gap-3 max-w-2xl">
-            {DIAS.map((dia) => (
-              <div
-                key={dia}
-                className="flex items-center gap-3 bg-gray-50 rounded-xl py-3 px-4 border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
-              >
-                <label className="font-bold capitalize min-w-[90px] text-gray-900 select-none">
-                  {dia}
-                </label>
-                <div className="flex items-center gap-2 flex-1">
-                  <Input
-                    type="time"
-                    value={config ? config[dia]?.[0]?.start || "" : ""}
-                    onChange={e => {
-                      setConfig((c) => ({
-                        ...c,
-                        [dia]: [{
-                          start: e.target.value,
-                          end: c && c[dia]?.[0]?.end || ""
-                        }]
-                      }));
-                    }}
-                    className="flex-1 max-w-[140px] text-center rounded-lg bg-white border-2 border-gray-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all font-semibold text-gray-900"
-                  />
-                  <span className="text-gray-400 font-bold">→</span>
-                  <Input
-                    type="time"
-                    value={config ? config[dia]?.[0]?.end || "" : ""}
-                    onChange={e => {
-                      setConfig((c) => ({
-                        ...c,
-                        [dia]: [{
-                          start: c && c[dia]?.[0]?.start || "",
-                          end: e.target.value
-                        }]
-                      }));
-                    }}
-                    className="flex-1 max-w-[140px] text-center rounded-lg bg-white border-2 border-gray-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all font-semibold text-gray-900"
-                  />
+          <div className="grid gap-4 max-w-3xl">
+            {DIAS.map((dia) => {
+              const rangos = config?.[dia] || [];
+              
+              return (
+                <div
+                  key={dia}
+                  className="bg-gray-50 rounded-xl py-4 px-4 border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-bold capitalize text-gray-900 select-none text-lg">
+                      {dia}
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentRangos = config?.[dia] || [];
+                        setConfig((c) => ({
+                          ...c,
+                          [dia]: [...currentRangos, { start: "", end: "" }]
+                        }));
+                      }}
+                      className="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1.5"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                      Agregar horario
+                    </button>
+                  </div>
+
+                  {rangos.length === 0 ? (
+                    <div className="text-center py-3 text-gray-400 text-sm italic">
+                      Sin horarios configurados - Click en "Agregar horario"
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {rangos.map((rango, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-gray-500 w-8">#{idx + 1}</span>
+                          <Input
+                            type="time"
+                            value={rango.start || ""}
+                            onChange={e => {
+                              const newRangos = [...rangos];
+                              newRangos[idx] = { ...newRangos[idx], start: e.target.value };
+                              setConfig((c) => ({
+                                ...c,
+                                [dia]: newRangos
+                              }));
+                            }}
+                            className="flex-1 max-w-[140px] text-center rounded-lg bg-white border-2 border-gray-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all font-semibold text-gray-900"
+                          />
+                          <span className="text-gray-600 font-semibold text-sm px-1">hasta</span>
+                          <Input
+                            type="time"
+                            value={rango.end || ""}
+                            onChange={e => {
+                              const newRangos = [...rangos];
+                              newRangos[idx] = { ...newRangos[idx], end: e.target.value };
+                              setConfig((c) => ({
+                                ...c,
+                                [dia]: newRangos
+                              }));
+                            }}
+                            className="flex-1 max-w-[140px] text-center rounded-lg bg-white border-2 border-gray-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all font-semibold text-gray-900"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newRangos = rangos.filter((_, i) => i !== idx);
+                              setConfig((c) => ({
+                                ...c,
+                                [dia]: newRangos
+                              }));
+                            }}
+                            className="p-2 hover:bg-red-100 rounded-lg transition-colors group"
+                            title="Eliminar horario"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-red-400 group-hover:text-red-600">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <Button
