@@ -55,51 +55,51 @@ export default function DateStep({ onSelect, selectedDate, onBack }: Props) {
     fetchConfig();
   }, []);
 
-  // Detectar qué elemento está en el centro usando Intersection Observer
+  // Detectar qué elemento está en el centro con scroll listener (más estable)
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const observerOptions = {
-      root: container,
-      rootMargin: '0px',
-      threshold: [0, 0.25, 0.5, 0.75, 1]
+    let timeoutId: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      // Debounce para evitar cálculos excesivos durante scroll rápido
+      clearTimeout(timeoutId);
+      
+      timeoutId = setTimeout(() => {
+        const containerRect = container.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+
+        dayRefs.current.forEach((ref, index) => {
+          if (ref) {
+            const rect = ref.getBoundingClientRect();
+            const elementCenter = rect.left + rect.width / 2;
+            const distance = Math.abs(containerCenter - elementCenter);
+
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestIndex = index;
+            }
+          }
+        });
+
+        if (closestIndex !== centerIndex) {
+          setCenterIndex(closestIndex);
+        }
+      }, 100); // Debounce de 100ms para evitar glitches
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      // Encontrar el elemento más cercano al centro
-      let closestEntry: IntersectionObserverEntry | null = null;
-      let closestDistance = Infinity;
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    // Calcular el centro inicial
+    handleScroll();
 
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const rect = entry.boundingClientRect;
-          const containerRect = container.getBoundingClientRect();
-          const containerCenter = containerRect.left + containerRect.width / 2;
-          const elementCenter = rect.left + rect.width / 2;
-          const distance = Math.abs(containerCenter - elementCenter);
-
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closestEntry = entry;
-          }
-        }
-      });
-
-      if (closestEntry) {
-        const index = dayRefs.current.findIndex(ref => ref === closestEntry!.target);
-        if (index !== -1 && index !== centerIndex) {
-          setCenterIndex(index);
-        }
-      }
-    }, observerOptions);
-
-    // Observar todos los días
-    dayRefs.current.forEach(ref => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
   }, [days.length, centerIndex]);
 
   // Auto-scroll al día seleccionado
