@@ -13,39 +13,42 @@ const StepBar: React.FC<StepBarProps> = ({ steps, currentStep, completedSteps, c
   const realCompleted = (idx: number) => idx + 1 < currentStep ? completedSteps[idx + 1] : false;
 
   return (
-    <div className="w-full overflow-x-auto mb-8 sm:mb-10 -mx-2 px-2 sm:mx-0 sm:px-0">
-      <div className="flex flex-row items-start min-w-[600px] sm:min-w-0 justify-between px-1 sm:px-2 gap-1 sm:gap-2">
+    <div className="w-full mb-6 sm:mb-8 md:mb-10">
+      {/* Una sola fila para todos los tamaños */}
+      <div className="flex flex-row items-start justify-between px-1 sm:px-2 gap-1 sm:gap-2">
         {steps.map((step, idx) => {
           const isActive = currentStep === idx + 1;
           const isCompleted = realCompleted(idx);
           return (
             <React.Fragment key={step}>
-              <div className="flex flex-col items-center min-w-[80px] sm:min-w-0 sm:max-w-none flex-1">
+              <div className="flex flex-col items-center flex-1 min-w-0">
                 <div className="flex flex-col items-center w-full">
                   <div
-                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300 relative select-none shadow-sm
+                    className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full transition-all duration-300 shadow-sm
                       ${isCompleted ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-emerald-200' :
                         isActive ? 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-indigo-200' :
                         'bg-gray-100 text-gray-400 border-2 border-gray-200'}
                     `}
                   >
                     {isCompleted ? (
-                      <CheckIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                     ) : (
-                      <span className="text-base sm:text-lg font-bold">{idx + 1}</span>
+                      <span className="text-sm sm:text-base md:text-lg font-bold">{idx + 1}</span>
                     )}
                   </div>
-                  <span className={`mt-2 sm:mt-3 text-[10px] sm:text-xs md:text-sm font-semibold text-center transition-colors duration-200 leading-tight ${isActive ? 'text-indigo-700' : isCompleted ? 'text-emerald-700' : 'text-gray-500'}`}>{step}</span>
+                  <span className={`mt-1.5 sm:mt-2 md:mt-3 text-[9px] sm:text-[10px] md:text-xs font-semibold text-center leading-tight px-0.5 ${isActive ? 'text-indigo-700' : isCompleted ? 'text-emerald-700' : 'text-gray-500'}`}>
+                    {step}
+                  </span>
                   {chosenOptions[idx + 1] && (
-                    <span className="mt-0.5 sm:mt-1 text-[9px] sm:text-[10px] md:text-xs text-gray-400 max-w-[70px] sm:max-w-[80px] md:max-w-[100px] truncate text-center">{chosenOptions[idx + 1]}</span>
+                    <span className="hidden sm:block mt-0.5 md:mt-1 text-[9px] md:text-[10px] text-gray-400 truncate text-center w-full px-1">
+                      {chosenOptions[idx + 1]}
+                    </span>
                   )}
                 </div>
               </div>
               {idx !== steps.length - 1 && (
-                <div className="flex-1 h-1 mx-1 sm:mx-2 mt-4 sm:mt-5 md:mt-6 relative flex items-center max-w-[40px] sm:max-w-[60px] md:max-w-[100px]">
-                  {/* Línea base */}
+                <div className="flex-shrink-0 w-3 sm:w-6 md:w-12 h-1 mt-3.5 sm:mt-4 md:mt-5 relative flex items-center">
                   <div className="absolute left-0 top-1/2 w-full h-0.5 bg-gray-200 rounded-full" style={{ transform: 'translateY(-50%)' }} />
-                  {/* Línea de progreso */}
                   {isCompleted && (
                     <div className="absolute left-0 top-1/2 h-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all duration-500" style={{ width: '100%', transform: 'translateY(-50%)' }} />
                   )}
