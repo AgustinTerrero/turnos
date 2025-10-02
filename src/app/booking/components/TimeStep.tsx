@@ -155,17 +155,17 @@ const TimeStep: React.FC<Props> = ({ onSelect, selectedTime, onBack, date }) => 
       )}
 
       {/* Leyenda */}
-      <div className="flex items-center gap-6 mb-8 text-sm">
+      <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-6 mb-8 text-sm max-w-sm sm:max-w-none mx-auto sm:mx-0">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-to-br from-indigo-600 to-blue-600"></div>
+          <div className="w-4 h-4 rounded bg-gradient-to-br from-indigo-600 to-blue-600 flex-shrink-0"></div>
           <span className="text-gray-600">Seleccionado</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-white border-2 border-gray-200"></div>
+          <div className="w-4 h-4 rounded bg-white border-2 border-gray-200 flex-shrink-0"></div>
           <span className="text-gray-600">Disponible</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gray-50 border-2 border-gray-200 opacity-40"></div>
+        <div className="flex items-center gap-2 col-span-2 sm:col-span-1 justify-center sm:justify-start">
+          <div className="w-4 h-4 rounded bg-gray-50 border-2 border-gray-200 opacity-40 flex-shrink-0"></div>
           <span className="text-gray-600">Reservado</span>
         </div>
       </div>

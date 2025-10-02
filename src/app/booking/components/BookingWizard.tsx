@@ -1,6 +1,6 @@
 "use client";
 // Esqueleto del wizard de reservas
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ServiceStep, { Service } from './ServiceStep';
 import DateStep from './DateStep';
 import TimeStep from './TimeStep';
@@ -24,6 +24,47 @@ const BookingWizard: React.FC = () => {
   const [saving, setSaving] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Manejar el botón de retroceso del navegador/sistema
+  useEffect(() => {
+    const handleBackButton = (e: PopStateEvent) => {
+      e.preventDefault();
+      
+      // Si estamos en el paso 1, permitir salir
+      if (step === 1) {
+        return;
+      }
+      
+      // En cualquier otro paso, volver al anterior
+      if (step === 5) {
+        // Desde confirmación, reiniciar
+        setState({ service: null, date: null, time: null });
+        setSaved(false);
+        setStep(1);
+      } else if (step > 1) {
+        setStep(step - 1);
+      }
+    };
+
+    // Agregar una entrada al historial cuando cambiamos de paso
+    if (step > 1) {
+      window.history.pushState({ step }, '');
+    }
+
+    // Escuchar el evento popstate (botón atrás)
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [step]);
+
+  // Función helper para volver atrás
+  const goBack = () => {
+    if (step > 1) {
+      window.history.back();
+    }
+  };
 
   // Configuración de pasos y opciones elegidas
   const steps = ["Servicio", "Fecha", "Hora", "Datos", "Confirmación"];
@@ -52,25 +93,25 @@ const BookingWizard: React.FC = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
           {/* Header elegante */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Reservá tu <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">turno</span>
             </h1>
-            <p className="text-gray-300 text-lg">Simple, rápido y profesional</p>
+            <p className="text-gray-300 text-base sm:text-lg">Simple, rápido y profesional</p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-white/20">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20">
             <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
-            <div className="mt-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+            <div className="mt-6 sm:mt-10">
+              <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
                   1
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Elegí tu servicio</h2>
-                  <p className="text-gray-500 text-sm">Seleccioná la opción que mejor se adapte a tus necesidades</p>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Elegí tu servicio</h2>
+                  <p className="text-gray-500 text-xs sm:text-sm">Seleccioná la opción que mejor se adapte a tus necesidades</p>
                 </div>
               </div>
               <ServiceStep
@@ -96,24 +137,24 @@ const BookingWizard: React.FC = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Reservá tu <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">turno</span>
             </h1>
-            <p className="text-gray-300 text-lg">Simple, rápido y profesional</p>
+            <p className="text-gray-300 text-base sm:text-lg">Simple, rápido y profesional</p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-white/20">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20">
             <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
-            <div className="mt-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+            <div className="mt-6 sm:mt-10">
+              <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
                   2
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Elegí la fecha</h2>
-                  <p className="text-gray-500 text-sm">Seleccioná el día que mejor te venga</p>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Elegí la fecha</h2>
+                  <p className="text-gray-500 text-xs sm:text-sm">Seleccioná el día que mejor te venga</p>
                 </div>
               </div>
               <DateStep
@@ -140,24 +181,24 @@ const BookingWizard: React.FC = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Reservá tu <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">turno</span>
             </h1>
-            <p className="text-gray-300 text-lg">Simple, rápido y profesional</p>
+            <p className="text-gray-300 text-base sm:text-lg">Simple, rápido y profesional</p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-white/20">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20">
             <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
-            <div className="mt-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+            <div className="mt-6 sm:mt-10">
+              <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
                   3
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Elegí el horario</h2>
-                  <p className="text-gray-500 text-sm">Seleccioná el horario que mejor se adapte a tu agenda</p>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Elegí el horario</h2>
+                  <p className="text-gray-500 text-xs sm:text-sm">Seleccioná el horario que mejor se adapte a tu agenda</p>
                 </div>
               </div>
               <TimeStep
@@ -185,24 +226,24 @@ const BookingWizard: React.FC = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3 tracking-tight">
               Reservá tu <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">turno</span>
             </h1>
-            <p className="text-gray-300 text-lg">Simple, rápido y profesional</p>
+            <p className="text-gray-300 text-base sm:text-lg">Simple, rápido y profesional</p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-white/20">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20">
             <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
-            <div className="mt-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+            <div className="mt-6 sm:mt-10">
+              <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
                   4
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Tus datos</h2>
-                  <p className="text-gray-500 text-sm">Completá tu información de contacto</p>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Tus datos</h2>
+                  <p className="text-gray-500 text-xs sm:text-sm">Completá tu información de contacto</p>
                 </div>
               </div>
               <DetailsStep
@@ -266,10 +307,10 @@ const BookingWizard: React.FC = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-10 border border-white/20">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20">
             <StepBar steps={steps} currentStep={step} completedSteps={completedSteps} chosenOptions={chosenOptions} />
-            <div className="mt-10">
+            <div className="mt-6 sm:mt-10">
               <ConfirmStep
           service={state.service.nombre || state.service.name || ''}
           date={state.date}
