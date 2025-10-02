@@ -63,13 +63,25 @@ export default function ServiciosManager() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "servicios"), (snap) => {
-      setServicios(
-        snap.docs.map((d) => ({ id: d.id, ...d.data() } as Servicio))
+    try {
+      const unsub = onSnapshot(
+        collection(db, "servicios"),
+        (snap) => {
+          setServicios(
+            snap.docs.map((d) => ({ id: d.id, ...d.data() } as Servicio))
+          );
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error loading servicios:", error);
+          setLoading(false);
+        }
       );
+      return () => unsub();
+    } catch (error) {
+      console.error("Error setting up servicios listener:", error);
       setLoading(false);
-    });
-    return () => unsub();
+    }
   }, []);
 
   const handleAddOrEdit = async (e: React.FormEvent) => {

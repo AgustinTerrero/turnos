@@ -30,12 +30,24 @@ export default function HorarioConfig() {
   // Eliminada lógica de abrir/cerrar calendario, ya no es necesaria
 
   useEffect(() => {
-    const ref = doc(db, "schedule_config", "main");
-    const unsub = onSnapshot(ref, (snap) => {
-  setConfig(snap.exists() ? snap.data() as ScheduleConfig : {});
+    try {
+      const ref = doc(db, "schedule_config", "main");
+      const unsub = onSnapshot(
+        ref,
+        (snap) => {
+          setConfig(snap.exists() ? snap.data() as ScheduleConfig : {});
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error loading schedule config:", error);
+          setLoading(false);
+        }
+      );
+      return () => unsub();
+    } catch (error) {
+      console.error("Error setting up schedule config listener:", error);
       setLoading(false);
-    });
-    return () => unsub();
+    }
   }, []);
 
   // Guardar automáticamente los feriados al cambiar

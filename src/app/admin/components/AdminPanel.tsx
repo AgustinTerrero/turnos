@@ -75,27 +75,39 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setTurnos(
-        snap.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            service: data.service || '',
-            date: data.date || '',
-            time: data.time || '',
-            name: data.name || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            wantsWhatsappReminder: data.wantsWhatsappReminder || false,
-            status: data.status || 'pendiente',
-          };
-        })
+    try {
+      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+      const unsub = onSnapshot(
+        q,
+        (snap) => {
+          setTurnos(
+            snap.docs.map((doc) => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                service: data.service || '',
+                date: data.date || '',
+                time: data.time || '',
+                name: data.name || '',
+                email: data.email || '',
+                phone: data.phone || '',
+                wantsWhatsappReminder: data.wantsWhatsappReminder || false,
+                status: data.status || 'pendiente',
+              };
+            })
+          );
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error loading appointments:", error);
+          setLoading(false);
+        }
       );
+      return () => unsub();
+    } catch (error) {
+      console.error("Error setting up listener:", error);
       setLoading(false);
-    });
-    return () => unsub();
+    }
   }, []);
 
   return (
